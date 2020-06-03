@@ -6,7 +6,9 @@ header(context, {bool isAppTitle = false, String titleText}) {
     title:  Text( isAppTitle ? "Fluttershare" : titleText, style: TextStyle(
       color:Colors.white,
       fontFamily: isAppTitle ? "Signatra" : "" ,
-      fontSize: isAppTitle ? 50.0 : 22.0
+      fontSize: isAppTitle ? 50.0 : 22.0,
+      
+
     ),),
 centerTitle: true,
 backgroundColor: Theme.of(context).accentColor,

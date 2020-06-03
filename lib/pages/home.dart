@@ -71,7 +71,11 @@ void dispose() {
   }
 
   onTap(int pageIndex) {
-    pageController.jumpToPage(pageIndex);
+    pageController.animateToPage
+    (pageIndex,
+    duration: Duration(milliseconds :300),
+    curve: Curves.bounceInOut
+    );
   }
   onPageChanged(int pageIndex){
     setState(() {
