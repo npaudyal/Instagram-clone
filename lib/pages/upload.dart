@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttershare/models/user.dart';
 import 'package:fluttershare/widgets/progress.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as Im;
@@ -162,7 +163,7 @@ createPostInFireStore({String mediaUrl, String location, String desc}){
   locationController.clear();
   setState(() {
     file = null;
-    isUploading: false;
+    isUploading = false;
     postId = Uuid().v4();
   });
 }
@@ -254,7 +255,7 @@ createPostInFireStore({String mediaUrl, String location, String desc}){
                   height: 100,
                   alignment: Alignment.center,
                   child: RaisedButton.icon(
-                    onPressed: () => print("USer location"),
+                    onPressed: getUserLocation,
                     icon: Icon(Icons.my_location, color: Colors.white,),
                     label: Text("Use current location", style: TextStyle(color: Colors.white),),
                     shape: RoundedRectangleBorder(
@@ -266,6 +267,14 @@ createPostInFireStore({String mediaUrl, String location, String desc}){
         ],
       ),
     );
+  }
+
+  getUserLocation()async{
+    Position position = await  Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    List<Placemark> placemarks = await Geolocator().placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark placemark = placemarks[0];
+    String formattedAddress = '${placemark.locality}, ${placemark.country}';
+    locationController.text = formattedAddress;
   }
   @override
   Widget build(BuildContext context) {

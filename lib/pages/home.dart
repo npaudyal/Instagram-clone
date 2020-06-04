@@ -133,7 +133,7 @@ void dispose() {
           ActivityFeed(),
           Upload(currentUser: currentUser),
           Search(),
-          Profile(),
+          Profile(profileId: currentUser?.id),
 
         ],
         controller: pageController,
