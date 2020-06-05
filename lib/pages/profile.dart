@@ -115,7 +115,10 @@ editProfile() {
          text: "Edit Profile",
          function: editProfile
        );
+     } else {
+       return Text("");
      }
+
 
 
    }

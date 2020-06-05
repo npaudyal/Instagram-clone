@@ -56,6 +56,7 @@ buildComments(){
 }
 
 addComment(){
+
   commentsRef
   .document(postId)
   .collection("comments")
@@ -66,7 +67,23 @@ addComment(){
     "avatarUrl": currentUser.photoUrl,
     "userId": currentUser.id
   });
+  bool isNotPostOwner = postOwnerId !=currentUser.id;
+
+  if(isNotPostOwner){
+  activityFeedRef.document(postOwnerId)
+  .collection("feedItems")
+  .add({
+        "type": "comment",
+        "commentData": commentController.text,
+        "username": currentUser.username,
+        "userId": currentUser.id,
+        "userProfileImg": currentUser.photoUrl,
+        "postId": postId,
+        "timestamp":timestamp,
+        "mediaUrl" : postMediaUrl
+  });
   commentController.clear();
+}
 }
   @override
   Widget build(BuildContext context) {

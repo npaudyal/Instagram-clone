@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttershare/models/user.dart';
+import 'package:fluttershare/pages/activity_feed.dart';
 import 'package:fluttershare/pages/comments.dart';
 import 'package:fluttershare/pages/home.dart';
 import 'package:fluttershare/widgets/custom_image.dart';
@@ -90,7 +91,7 @@ buildPostHeader(){
           backgroundColor: Colors.grey,
         ),
         title: GestureDetector(
-            onTap: () => print("Person tapped"),
+            onTap: () => showProfile(context, profileId: user.id),
             child: Text(
             user.username,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -117,6 +118,7 @@ handleLikePost(){
     .updateData({
       "likes.$currentUserId" : false
     });
+    removeLikeFromActivityFeed();
     setState(() {
       likeCount-=1;
       _isLiked = false;
@@ -132,6 +134,7 @@ handleLikePost(){
     .updateData({
       "likes.$currentUserId" : true
     });
+    addLikeToActivityFeed();
     setState(() {
       likeCount+=1;
       _isLiked = true;
@@ -145,6 +148,40 @@ handleLikePost(){
     });
   }
 
+}
+
+removeLikeFromActivityFeed() {
+  bool isNotPostOwner = currentUser != ownerId;
+
+  if(isNotPostOwner){
+   activityFeedRef.document(ownerId)
+      .collection("feedItems")
+      .document(postId)
+      .get().then((doc){
+        if(doc.exists) {
+          doc.reference.delete();
+        }
+      });
+
+}
+}
+addLikeToActivityFeed(){
+  bool isNotPostOwner = currentUser != ownerId;
+
+  if(isNotPostOwner){
+      activityFeedRef.document(ownerId)
+      .collection("feedItems")
+      .document(postId)
+      .setData({
+        "type": "like",
+        "username": currentUser.username,
+        "userId": currentUser.id,
+        "userProfileImg": currentUser.photoUrl,
+        "postId": postId,
+        "timestamp":timestamp,
+        "mediaUrl" : mediaUrl
+      });
+    }
 }
 
 buildPostImage(){

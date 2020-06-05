@@ -9,7 +9,9 @@ header(context, {bool isAppTitle = false, String titleText, removeBackButton = f
       fontSize: isAppTitle ? 50.0 : 22.0,
       
 
-    ),),
+    ),
+    overflow: TextOverflow.ellipsis,
+    ),
 centerTitle: true,
 backgroundColor: Theme.of(context).accentColor,
   );
