@@ -17,7 +17,7 @@ class PostScreen extends StatelessWidget {
       .get(),
       builder: (context, snapshot) {
         if(!snapshot.hasData){
-          circularProgress();
+          return circularProgress();
         }
         Post post = Post.fromDocument(snapshot.data);
         return Center(

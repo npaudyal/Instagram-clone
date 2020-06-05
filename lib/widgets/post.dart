@@ -19,7 +19,7 @@ class Post extends StatefulWidget {
   final String location;
   final String desc;
   final String mediaUrl;
-  final dynamic  likes;
+  final dynamic likes;
 
   Post({this.postId, this.ownerId, this.username, this.location, this.desc, this.likes, this.mediaUrl });
 
@@ -219,38 +219,39 @@ handleLikePost(){
 }
 
 removeLikeFromActivityFeed() {
-  bool isNotPostOwner = currentUser != ownerId;
-
-  if(isNotPostOwner){
-   activityFeedRef.document(ownerId)
-      .collection("feedItems")
-      .document(postId)
-      .get().then((doc){
-        if(doc.exists) {
+   bool isNotPostOwner = currentUserId != ownerId;
+    if (isNotPostOwner) {
+      activityFeedRef
+          .document(ownerId)
+          .collection("feedItems")
+          .document(postId)
+          .get()
+          .then((doc) {
+        if (doc.exists) {
           doc.reference.delete();
         }
       });
-
-}
-}
+    }
+  }
 addLikeToActivityFeed(){
-  bool isNotPostOwner = currentUser != ownerId;
-
-  if(isNotPostOwner){
-      activityFeedRef.document(ownerId)
-      .collection("feedItems")
-      .document(postId)
-      .setData({
+    // add a notification to the postOwner's activity feed only if comment made by OTHER user (to avoid getting notification for our own like)
+    bool isNotPostOwner = currentUserId != ownerId;
+    if (isNotPostOwner) {
+      activityFeedRef
+          .document(ownerId)
+          .collection("feedItems")
+          .document(postId)
+          .setData({
         "type": "like",
         "username": currentUser.username,
         "userId": currentUser.id,
         "userProfileImg": currentUser.photoUrl,
         "postId": postId,
-        "timestamp":timestamp,
-        "mediaUrl" : mediaUrl
+        "mediaUrl": mediaUrl,
+        "timestamp": timestamp,
       });
     }
-}
+  }
 
 buildPostImage(){
   return GestureDetector(
