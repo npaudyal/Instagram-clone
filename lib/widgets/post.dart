@@ -85,6 +85,7 @@ buildPostHeader(){
         return circularProgress();
       }
       User user = User.fromDocument(snapshot.data);
+      bool isPostOwner = currentUserId == ownerId;
       return ListTile(
         leading: CircleAvatar(
           backgroundImage: CachedNetworkImageProvider(user.photoUrl),
@@ -98,14 +99,81 @@ buildPostHeader(){
             ),
         ),
         subtitle: Text(location) ,
-        trailing: IconButton(
+        trailing: isPostOwner ? IconButton(
           icon: Icon(Icons.more_vert),
-           onPressed: () => print("deleting post")),
+           onPressed: () =>handleDeletePost(context)) : Text(""),
       );
       
     });
 
 }
+
+handleDeletePost(BuildContext parentContext){
+
+  return showDialog(
+    context: parentContext,
+    builder: (context) {
+      return SimpleDialog(title: Text('Remove this post?'),
+      children: <Widget>[
+        SimpleDialogOption(
+          onPressed: () {
+            Navigator.pop(context);
+            deletePost();
+          },
+          child: Text('Delete',
+          style: TextStyle(color: Colors.red),),
+        ),
+        SimpleDialogOption(
+          onPressed:() => Navigator.pop(context),
+          child: Text('Cancel',)
+        ),
+      ],
+      );
+    }
+  );
+
+}
+
+
+deletePost () async {
+
+postsRef
+.document(ownerId)
+.collection("userPosts")
+.document(postId)
+.get().then((value) => {
+  if(value.exists){
+    value.reference.delete()
+  }
+});
+  storageRef.child("post_$postId.jpg").delete();
+  QuerySnapshot activityFeedSnapshot =await activityFeedRef
+  .document(ownerId)
+  .collection("feedItems")
+  .where("postId", isEqualTo: postId)
+  .getDocuments();
+
+  activityFeedSnapshot.documents.forEach((doc) {
+     if(doc.exists){
+    doc.reference.delete();
+  }
+  });
+
+ QuerySnapshot commentSnapshot =await commentsRef
+  .document(postId)
+  .collection("comments")
+  .getDocuments();
+
+   commentSnapshot.documents.forEach((doc) {
+     if(doc.exists){
+    doc.reference.delete();
+  }
+  });
+
+}
+
+
+
 handleLikePost(){
 
   bool _isLiked = likes[currentUserId] == true;

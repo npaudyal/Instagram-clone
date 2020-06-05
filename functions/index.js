@@ -38,4 +38,30 @@ exports.onCreateFollower = functions.firestore
                 }
             })
 
-        })
+        });
+
+
+        exports.onDeleteFollowers = functions.firestore
+            .document("/followers/{userId}/userFollowers/{followerId}")
+            .onDelete(async (snapshot, context) => {
+                    console.log("Followers Deleted" , snapshot.id);
+
+                    const userId = context.params.userId;
+                    const followerId = context.params.followerId;
+
+                    const timelinePostRef = admin
+                    .firestore()
+                    .collection('timeline')
+                    .doc(followerId)
+                    .collection('timelinePosts')
+                    .where("ownerId", "==", userId);
+
+                    const querySnapshot = await timelinePostRef.get();
+                    querySnapshot.forEach(doc => {
+                        if(doc.exists){
+                            doc.ref.delete();
+                        }
+                    })
+        
+
+            })
