@@ -16,6 +16,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 final GoogleSignIn googleSignIn = GoogleSignIn(); 
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 final usersRef = Firestore.instance.collection('users');
+final timelineRef = Firestore.instance.collection('timeline');
+
 final followersRef = Firestore.instance.collection('followers');
 final followingRef = Firestore.instance.collection('following');
 
@@ -78,6 +80,13 @@ class _HomeState extends State<Home> {
 
           });
 
+          await followersRef
+          .document(user.id)
+          .collection("userFollowers")
+          .document(user.id)
+          .setData({});
+
+
           doc = await usersRef.document(user.id).get();
           }
 
@@ -86,9 +95,9 @@ class _HomeState extends State<Home> {
            print(currentUser);
           }
 
-  handleSignIn(GoogleSignInAccount account){
+  handleSignIn(GoogleSignInAccount account )async {
      if(account !=null){
-          createUserInFirestore();
+          await createUserInFirestore();
           
           setState(() {
             isAuth = true;
@@ -132,10 +141,7 @@ void dispose() {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-          RaisedButton(
-      child: Text("Logout"),
-      onPressed: logout,
-    ),
+         Timeline(currentUser: currentUser),
           ActivityFeed(),
           Upload(currentUser: currentUser),
           Search(),
